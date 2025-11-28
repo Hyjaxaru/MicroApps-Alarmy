@@ -6,16 +6,16 @@
 //
 
 import Foundation
-import SwiftData
 
-@Model
-class Alarm: Codable, Identifiable {
+class Alarm: Codable, Identifiable, Hashable {
     var id: String
     var name: String
     var dateTs: Int = 0
     var days: [AlarmDay]
     var enabled: Bool
+    var willRepeat: Bool
     
+    // MARK: - Getters
     var date: Date {
         get {
             return Date(timeIntervalSince1970: TimeInterval(dateTs))
@@ -52,28 +52,32 @@ class Alarm: Codable, Identifiable {
     }
     
     // MARK: - Initialisers
-    init(id: String, name: String, date: Date, days: [AlarmDay], enabled: Bool) {
-        self.id = id
+    init(name: String, date: Date = .now, days: [AlarmDay] = AlarmDay.all, enabled: Bool = true, willRepeat: Bool = true) {
+        self.id = UUID().uuidString
         self.name = name
         self.days = days
         self.enabled = enabled
+        self.willRepeat = willRepeat
         self.date = date
     }
     
     required init(from decoder: any Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        id = try values.decode(String.self, forKey: .id)
-        name = try values.decode(String.self, forKey: .name)
-        dateTs = try values.decode(Int.self, forKey: .dateTs)
-        days = try values.decodeIfPresent(Array<AlarmDay>.self, forKey: .days) ?? []
-        enabled = try values.decode(Bool.self, forKey: .enabled)
+        self.id = try values.decode(String.self, forKey: .id)
+        self.name = try values.decode(String.self, forKey: .name)
+        self.dateTs = try values.decode(Int.self, forKey: .dateTs)
+        self.days = try values.decode([AlarmDay].self, forKey: .days)
+        self.enabled = try values.decode(Bool.self, forKey: .enabled)
+        self.willRepeat = try values.decode(Bool.self, forKey: .withRepeat)
+        
     }
-    
+
     // MARK: - Codable
     enum CodingKeys: String, CodingKey {
         case id, name
         case dateTs = "date"
         case days, enabled
+        case withRepeat = "repeat"
     }
     
     func encode(to encoder: any Encoder) throws {
@@ -82,6 +86,8 @@ class Alarm: Codable, Identifiable {
         try container.encode(name, forKey: .name)
         try container.encode(dateTs, forKey: .dateTs)
         try container.encode(days, forKey: .days)
+        try container.encode(enabled, forKey: .enabled)
+        try container.encode(willRepeat, forKey: .withRepeat)
     }
     
     // MARK: - Hashable
@@ -91,20 +97,20 @@ class Alarm: Codable, Identifiable {
         hasher.combine(dateTs)
         hasher.combine(days)
         hasher.combine(enabled)
+        hasher.combine(willRepeat)
     }
 }
 
 func == (lhs: Alarm, rhs: Alarm) -> Bool {
     return lhs.id == rhs.id
+    && lhs.name == rhs.name
+    && lhs.date == rhs.date
+    && lhs.days == rhs.days
+    && lhs.enabled == rhs.enabled
+    && lhs.willRepeat == rhs.willRepeat
 }
 
 // MARK: - Static
 extension Alarm {
-    static let example: Alarm = .init(
-        id: UUID().uuidString,
-        name: "Example",
-        date: Date(),
-        days: AlarmDay.all,
-        enabled: true
-    )
+    static let new: Alarm = .init(name: "New Alarm")
 }

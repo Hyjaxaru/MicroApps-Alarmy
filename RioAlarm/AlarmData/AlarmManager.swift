@@ -21,20 +21,8 @@ class AlarmManager {
     }
     
     var testAPIAlarms = [
-        Alarm(
-            id: UUID().uuidString,
-            name: "API Alarm 1",
-            date: .now,
-            days: AlarmDay.all,
-            enabled: true,
-        ),
-        Alarm(
-            id: UUID().uuidString,
-            name: "API Alarm 2",
-            date: .now,
-            days: AlarmDay.all,
-            enabled: true,
-        )
+        Alarm(name: "API Alarm 1"),
+        Alarm(name: "API Alarm 2")
     ]
     
     func getAlarms() async throws -> [Alarm] {

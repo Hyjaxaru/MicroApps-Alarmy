@@ -62,17 +62,20 @@ struct AppConfigSheet: View {
                     Text("This will be stored securely in your iCloud Keychain")
                 }
                 
-                // MARK: - Endpoints
+                // MARK: - Links
                 Section {
-                    // GET alarms
-                    URLTextFieldListRow("GET Alarms", hint: "/alarms", text: $apiEndpointGetAlarms)
                     
-                    // POST alarm
-                    URLTextFieldListRow("POST Alarm", hint: "/alarms", text: $apiEndpointPostAlarm)
                 } header: {
-                    Text("Endpoints")
+                    Text("About")
                 } footer: {
-                    Text("URL: https://alarmy.riothe.dev")
+                    let year = Calendar.current.component(.year, from: Date())
+                    HStack(spacing: 0) {
+                        Text("Copyright © \(String(year)) Noah Albrock  ")
+                        Image(systemName: "circle.fill").font(.system(size: 4))
+                        Text("  Made with ")
+                        Image(systemName: "heart.fill")
+                            .foregroundStyle(.pink.gradient)
+                    }
                 }
             }
             .navigationTitle("About Alarmy")

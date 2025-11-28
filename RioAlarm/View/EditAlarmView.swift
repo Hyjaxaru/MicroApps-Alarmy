@@ -10,15 +10,27 @@ import SwiftUI
 struct EditAlarmView: View {
     @Environment(\.colorScheme) private var colorScheme
     
-    @Bindable var alarm: Alarm
+    var alarm: Alarm
+    var editAction: () -> ()
     var deleteAction: () -> ()
     
-    init(for alarm: Alarm, deleteAction: @escaping () -> ()) {
+    @State private var tempAlarm: Alarm
+    
+    init(
+        for alarm: Alarm,
+        editAction: @escaping () -> (),
+        deleteAction: @escaping () -> ()
+    ) {
         self.alarm = alarm
+        self.tempAlarm = alarm
+        
+        self.editAction = editAction
         self.deleteAction = deleteAction
     }
 
     var listBackgroundColor: Color { Color(colorScheme == .dark ? .systemBackground : .secondarySystemBackground) }
+    
+    @State private var test: Set<AlarmDay> = []
     
     var body: some View {
         ZStack {
@@ -54,7 +66,7 @@ struct EditAlarmView: View {
                 // MARK: - Settings
                 Section {
                     // time
-                    DatePicker("Time", selection: $alarm.date, displayedComponents: [.hourAndMinute])
+                    DatePicker("Time", selection: $tempAlarm.date, displayedComponents: [.hourAndMinute])
                     
                     // name
                     HStack {
@@ -62,12 +74,12 @@ struct EditAlarmView: View {
                         
                         Spacer()
                         
-                        TextField("Name", text: $alarm.name)
+                        TextField("Name", text: $tempAlarm.name)
                             .multilineTextAlignment(.trailing)
                     }
                     
                     // enabled
-                    Toggle("Enabled", isOn: $alarm.enabled)
+                    Toggle("Enabled", isOn: $tempAlarm.enabled)
                     
                     // days
                     VStack(alignment: .leading) {
@@ -98,31 +110,41 @@ struct EditAlarmView: View {
                     }
                 }
                 
-                // MARK: - Actions
+                // MARK: - Danger Zone
                 Section {
                     Button("Delete", systemImage: "trash", role: .destructive, action: deleteAction)
+                        .foregroundStyle(.red)
                 } header: {
-                    Text("Options")
+                    Text("Danger Zone")
                 } footer: {
                     Text(alarm.id)
                 }
             }
             .navigationTitle(alarm.name)
             .scrollContentBackground(.hidden)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    if #available(iOS 26.0, *) {
+                        Button("Done", systemImage: "checkmark", role: .confirm, action: editAction)
+                    } else {
+                        Button("Done", action: editAction)
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Delete", systemImage: "trash", role: .destructive, action: deleteAction)
+                }
+            }
         }
     }
 }
 
+// MARK: - Preview
 #Preview {
     NavigationStack {
         EditAlarmView(
-            for: Alarm(
-                id: UUID().uuidString,
-                name: "Everyday Alarm",
-                date: .now,
-                days: AlarmDay.all,
-                enabled: true,
-            ),
+            for: Alarm.new,
+            editAction: {},
             deleteAction: {}
         )
     }

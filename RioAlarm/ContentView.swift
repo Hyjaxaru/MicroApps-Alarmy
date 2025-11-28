@@ -14,18 +14,8 @@ struct ContentView: View {
     
     func addAlarm() {
         withAnimation {
-            // create and add the new alarm
-            let alarm = Alarm(
-                id: UUID().uuidString,
-                name: "New Alarm",
-                date: .now,
-                days: AlarmDay.all,
-                enabled: true,
-            )
-            
+            let alarm = Alarm.new
             viewModel.alarms.append(alarm)
-            
-            // select the alarm
             viewModel.selectedAlarm = alarm
         }
     }
@@ -86,15 +76,16 @@ struct ContentView: View {
             if viewModel.selectedAlarm != nil {
                 EditAlarmView(
                     for: viewModel.selectedAlarm!,
-                    deleteAction: {  }
+                    editAction: {},
+                    deleteAction: {}
                 )
-                    .toolbar {
-                        if horizontalSizeClass != .compact {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                Button("Add", systemImage: "plus", action: addAlarm)
-                            }
+                .toolbar {
+                    if horizontalSizeClass != .compact {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Add", systemImage: "plus", action: addAlarm)
                         }
                     }
+                }
             } else {
                 ContentUnavailableView {
                     Label("Alarmy", systemImage: "alarm")
