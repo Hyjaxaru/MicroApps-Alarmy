@@ -7,18 +7,124 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+struct ContentView: View {    
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+
+    @State private var viewModel = ViewModel()
+    
+    func addAlarm() {
+        withAnimation {
+            // create and add the new alarm
+            let alarm = Alarm(
+                id: UUID().uuidString,
+                name: "New Alarm",
+                date: .now,
+                days: AlarmDay.all,
+                enabled: true,
+            )
+            
+            viewModel.alarms.append(alarm)
+            
+            // select the alarm
+            viewModel.selectedAlarm = alarm
         }
-        .padding()
+    }
+    
+    var body: some View {
+        NavigationSplitView {
+            ZStack {
+                List(viewModel.alarms, selection: $viewModel.selectedAlarm) { alarm in
+                    NavigationLink(value: alarm) {
+                        VStack(alignment: .leading) {
+                            Text(alarm.date.formatted(date: .omitted, time: .shortened))
+                                .font(.system(size: 72))
+                                .fontWeight(.bold)
+                                .fontDesign(.rounded)
+                            
+                            HStack {
+                                Text(alarm.name)
+                                    .lineLimit(1)
+                                
+                                Text("-")
+                                    .foregroundStyle(.secondary)
+                                
+                                Text(alarm.dayDisplay)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+                
+                if horizontalSizeClass == .compact && viewModel.alarms.isEmpty {
+                    ContentUnavailableView {
+                        Label("No Alarms", systemImage: "alarm")
+                    } description: {
+                        Text("You don't have any alarms set up.")
+                        
+                        Button("Create new Alarm", systemImage: "plus", action: addAlarm)
+                    }
+                }
+            }
+            .navigationTitle("Alarms")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("settings", systemImage: "gear") {
+                        viewModel.isAppConfigSheetPresented.toggle()
+                    }
+                    .sheet(isPresented: $viewModel.isAppConfigSheetPresented) {
+                        AppConfigSheet(isPresented: $viewModel.isAppConfigSheetPresented)
+                    }
+                }
+                
+                if horizontalSizeClass == .compact {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Add", systemImage: "plus", action: addAlarm)
+                    }
+                }
+            }
+        } detail: {
+            if viewModel.selectedAlarm != nil {
+                EditAlarmView(
+                    for: viewModel.selectedAlarm!,
+                    deleteAction: {  }
+                )
+                    .toolbar {
+                        if horizontalSizeClass != .compact {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button("Add", systemImage: "plus", action: addAlarm)
+                            }
+                        }
+                    }
+            } else {
+                ContentUnavailableView {
+                    Label("Alarmy", systemImage: "alarm")
+                } description: {
+                    Text("Select an alarm to edit it.")
+                    
+                    Button("Create new Alarm", systemImage: "plus", action: addAlarm)
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Add", systemImage: "plus", action: addAlarm)
+                    }
+                }
+            }
+        }
     }
 }
 
+// MARK: - View Model
+extension ContentView {
+    @Observable
+    class ViewModel {
+        var alarms: [Alarm] = []
+        var selectedAlarm: Alarm?
+        
+        var isAppConfigSheetPresented: Bool = false
+    }
+}
+
+// MARK: - Preview
 #Preview {
     ContentView()
 }
