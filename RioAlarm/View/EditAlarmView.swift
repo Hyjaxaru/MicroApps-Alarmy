@@ -84,12 +84,12 @@ struct EditAlarmView: View {
                     // days
                     VStack(alignment: .leading) {
                         Text("Days")
-                            .badge(alarm.dayDisplay)
+                            .badge(tempAlarm.dayDisplay)
                         
                         HStack {
                             ForEach(AlarmDay.all, id: \.rawValue) { day in
                                 let index = day.name.index(day.name.startIndex, offsetBy: 0)
-                                let selected = alarm.days.contains(day)
+                                let selected = tempAlarm.days.contains(day)
                                 let color = selected ? Color.accentColor : listBackgroundColor
                                 
                                 Text(String(day.name[index]))
@@ -100,9 +100,9 @@ struct EditAlarmView: View {
                                     .fontWeight(selected ? .bold : .regular)
                                     .onTapGesture {
                                         if selected {
-                                            alarm.days.removeAll(where: { $0 == day })
+                                            tempAlarm.days.removeAll(where: { $0 == day })
                                         } else {
-                                            alarm.days.append(day)
+                                            tempAlarm.days.append(day)
                                         }
                                     }
                             }
@@ -117,17 +117,19 @@ struct EditAlarmView: View {
                 } header: {
                     Text("Danger Zone")
                 } footer: {
-                    Text(alarm.id)
+                    Text(tempAlarm.id)
                 }
             }
             .navigationTitle(alarm.name)
             .scrollContentBackground(.hidden)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    if #available(iOS 26.0, *) {
-                        Button("Done", systemImage: "checkmark", role: .confirm, action: editAction)
-                    } else {
-                        Button("Done", action: editAction)
+                    if tempAlarm != alarm {
+                        if #available(iOS 26.0, *) {
+                            Button("Done", systemImage: "checkmark", role: .confirm, action: editAction)
+                        } else {
+                            Button("Done", action: editAction)
+                        }
                     }
                 }
                 

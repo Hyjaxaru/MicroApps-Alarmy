@@ -64,17 +64,38 @@ struct AppConfigSheet: View {
                 
                 // MARK: - Links
                 Section {
+                    Link(destination: URL(string: "https://github.com/Hyjaxaru/MicroApps-Alarmy")!) {
+                        Text("Source").badge("Github.com")
+                    }
                     
+                    Link(destination: URL(string: "https://riothe.dev")!) {
+                        Text("Rio's Portfolio").badge("riothe.dev")
+                    }
+                    
+                    Link(destination: URL(string: "https://www.hyjaxaru.dev")!) {
+                        Text("My Portfolio").badge("hyjaxaru.dev")
+                    }
                 } header: {
                     Text("About")
                 } footer: {
-                    let year = Calendar.current.component(.year, from: Date())
-                    HStack(spacing: 0) {
-                        Text("Copyright © \(String(year)) Noah Albrock  ")
-                        Image(systemName: "circle.fill").font(.system(size: 4))
-                        Text("  Made with ")
-                        Image(systemName: "heart.fill")
-                            .foregroundStyle(.pink.gradient)
+                    VStack(alignment: .leading) {
+                        let year = Calendar.current.component(.year, from: Date())
+                        HStack(spacing: 0) {
+                            Text("Copyright © \(String(year)) Noah Albrock  ")
+                            
+                            Image(systemName: "circle.fill")
+                                .font(.system(size: 4))
+                            
+                            Text("  Made with ")
+                            
+                            Image(systemName: "heart.fill")
+                                .foregroundStyle(.pink.gradient)
+                                .font(.system(size: 12))
+                        }
+                        
+                        Spacer()
+                        
+                        Text("This project is designed to be seperate from Rio Wrenn's work in CMP101/104, and is not ment to be assessed alongside it.")
                     }
                 }
             }

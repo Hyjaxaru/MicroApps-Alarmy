@@ -45,7 +45,7 @@ struct ContentView: View {
                     }
                 }
                 
-                if horizontalSizeClass == .compact && viewModel.alarms.isEmpty {
+                if viewModel.alarms.isEmpty {
                     ContentUnavailableView {
                         Label("No Alarms", systemImage: "alarm")
                     } description: {
@@ -91,8 +91,8 @@ struct ContentView: View {
                     Label("Alarmy", systemImage: "alarm")
                 } description: {
                     Text("Select an alarm to edit it.")
-                    
-                    Button("Create new Alarm", systemImage: "plus", action: addAlarm)
+//                    
+//                    Button("Create new Alarm", systemImage: "plus", action: addAlarm)
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
