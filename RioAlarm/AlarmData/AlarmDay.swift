@@ -21,5 +21,7 @@ enum AlarmDay: String, Codable, Identifiable {
 }
 
 extension AlarmDay {
-    static let all: [AlarmDays] = [.monday, .tuesday, .wedensday, .thursday, .friday, .saturday, .sunday]
+    static let all: [AlarmDay] = [.monday, .tuesday, .wedensday, .thursday, .friday, .saturday, .sunday]
+    static let weekdays: [AlarmDay] = [.monday, .tuesday, .wedensday, .thursday, .friday]
+    static let weekends: [AlarmDay] = [.saturday, .sunday]
 }
